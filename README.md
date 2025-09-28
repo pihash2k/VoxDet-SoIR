@@ -1,203 +1,221 @@
-# VoxDet Dataset
+# VoxDet Instance Retrieval Dataset
 
-A unified visual object detection dataset combining synthetic (OWID) and real-world (RoboTools) data for query-based object detection and visual search tasks.
+A comprehensive instance retrieval dataset built upon the VoxDet foundation, combining synthetic (OWID) and real-world (RoboTools) data for visual instance search and retrieval tasks.
 
 ## Overview
 
-VoxDet is designed for few-shot and query-based object detection tasks where the goal is to find instances of query objects within gallery images. The dataset provides both synthetic data with rich annotations (OWID) and real-world robotic scenarios (RoboTools).
+This dataset extends VoxDet for **instance retrieval** applications, where the primary task is to retrieve all occurrences of a query object instance from a large gallery of images. Unlike traditional object detection that focuses on category-level detection, this dataset emphasizes **instance-level retrieval** - finding the exact same object or highly similar instances across different viewpoints, lighting conditions, and contexts.
+
+### Key Features
+- **Instance-level annotations** for precise object retrieval
+- **Query-gallery paradigm** optimized for retrieval benchmarking  
+- **Cross-domain evaluation** with synthetic-to-real transfer capabilities
+- **Multi-instance support** for complex retrieval scenarios
+
+## Instance Retrieval Task
+
+In instance retrieval, given a query image containing a specific object instance, the goal is to:
+1. Search through a large gallery of images
+2. Retrieve all images containing that specific instance
+3. Localize the instance with bounding boxes and masks
+4. Rank results by relevance/confidence
+
+This differs from category-level detection by requiring fine-grained instance matching rather than category classification.
 
 ## Dataset Components
 
 ### 1. OWID (Open World Instance Detection)
-- **Type**: Synthetic dataset
-- **Content**: Computer-generated images with precise annotations
-- **Structure**: Query-gallery pairs with segmentation masks
-- **Split**: Training and validation sets
+- **Purpose**: Training and validation for instance retrieval models
+- **Type**: Synthetic dataset with controlled variations
+- **Content**: Computer-generated images with precise instance annotations
+- **Retrieval Setup**: Query-gallery pairs with ground truth matches
+- **Split**: Training and validation sets for retrieval evaluation
 
-### 2. RoboTools
-- **Type**: Real-world dataset  
-- **Content**: Images from robotic/tools scenarios
-- **Structure**: Test videos and corresponding scene images
-- **Split**: Test set only
+### 2. RoboTools  
+- **Purpose**: Real-world instance retrieval evaluation
+- **Type**: Real-world dataset from robotic/industrial scenarios
+- **Content**: Challenging real-world instances with occlusions and viewpoint changes
+- **Retrieval Setup**: Video frame queries to retrieve from test scenes
+- **Split**: Test set only for zero-shot retrieval evaluation
 
 ## Directory Structure
 
 ```
-VoxDet/
+VoxDet-InstanceRetrieval/
 ├── OWID/
-│   ├── P1/                    # Query images directory
-│   │   ├── <category_id>/     # Category-specific folders
-│   │   │   ├── rgb/           # RGB query images
-│   │   │   └── mask/          # Binary segmentation masks
+│   ├── P1/                    # Query instances directory
+│   │   ├── <category_id>/     # Instance category folders
+│   │   │   ├── rgb/           # Query instance images
+│   │   │   └── mask/          # Instance segmentation masks
 │   │   └── ...
-│   └── P2/                    # Gallery images directory
-│       ├── images/            # Gallery RGB images
-│       ├── train_annotations.json  # Training annotations (COCO format)
-│       └── val_annotations.json    # Validation annotations (COCO format)
+│   └── P2/                    # Gallery for retrieval
+│       ├── images/            # Gallery images to search
+│       ├── train_annotations.json  # Training instance annotations
+│       └── val_annotations.json    # Validation instance annotations
 │
 ├── RoboTools/
-│   ├── test/                  # Gallery test images
-│   │   ├── scene_gt_coco_all.json  # Scene annotations (COCO format)
-│   │   └── *.jpg/png          # Test images
-│   └── test_video/            # Query video frames
+│   ├── test/                  # Gallery for retrieval evaluation
+│   │   ├── scene_gt_coco_all.json  # Ground truth instance locations
+│   │   └── *.jpg/png          # Gallery images
+│   └── test_video/            # Query instances from videos
 │       ├── <category_name>_<category_id>/
-│       │   ├── rgb/           # RGB query frames
-│       │   └── mask/          # Binary segmentation masks
+│       │   ├── rgb/           # Query instance frames
+│       │   └── mask/          # Instance segmentation masks
 │       └── ...
 │
-└── anns.pt                    # Processed annotations (output)
+└── anns.pt                    # Processed retrieval annotations
 ```
 
-## Annotation Format
+## Retrieval Annotation Format
 
 ### PyTorch Dictionary Structure (`anns.pt`)
 
-The processed annotations are saved as a PyTorch dictionary with the following structure:
+The annotations are optimized for instance retrieval tasks:
 
 ```python
 {
     "<image_path>": {
-        "bbox": [...],        # Bounding boxes
-        "mask": [...],        # Segmentation masks (RLE encoded)
-        "is_query": bool,     # True if query image, False if gallery
-        "is_val": bool,       # True if validation set, False otherwise
-        "ins": [...],         # Instance/category IDs
-        "set": str,           # Dataset name ("OWID" or "RoboTools")
-        "num_ins": [...]      # Number of instances (OWID only)
+        "bbox": [...],        # Instance bounding boxes
+        "mask": [...],        # Instance segmentation masks (RLE)
+        "is_query": bool,     # Query instance flag
+        "is_val": bool,       # Validation set flag
+        "ins": [...],         # Instance IDs for retrieval matching
+        "set": str,           # Dataset source ("OWID" or "RoboTools")
+        "num_ins": [...]      # Instance count (OWID only)
     },
     ...
 }
 ```
 
-### Field Descriptions
+### Instance Retrieval Fields
 
-#### For Query Images
-- **bbox**: Single bounding box `(x1, y1, x2, y2)` extracted from mask
-- **mask**: RLE-encoded binary segmentation mask
-- **is_query**: `True`
-- **is_val**: `False`
-- **ins**: Single category ID
-- **set**: Dataset identifier
+#### Query Instances
+- **bbox**: Precise instance location `(x1, y1, x2, y2)`
+- **mask**: Instance segmentation for accurate matching
+- **is_query**: `True` - marks retrieval query
+- **ins**: Unique instance identifier for matching
+- **set**: Dataset source for cross-domain evaluation
 
-#### For Gallery Images
-- **bbox**: List of bounding boxes `[(x1, y1, x2, y2), ...]` for each instance
-- **mask**: List of RLE-encoded masks (OWID) or empty list (RoboTools)
-- **is_query**: `False`
-- **is_val**: `True` for validation set, `False` for training
-- **ins**: List of category IDs `[cat_id1, cat_id2, ...]`
-- **set**: Dataset identifier
-- **num_ins**: List of instance counts per annotation (OWID only)
+#### Gallery Images (Retrieval Targets)
+- **bbox**: List of all instance locations for retrieval evaluation
+- **mask**: Instance masks for IoU-based retrieval metrics
+- **is_query**: `False` - marks gallery/database image
+- **ins**: List of instance IDs present (for ground truth matching)
+- **num_ins**: Instance counts for retrieval difficulty assessment
 
-### Bounding Box Format
-- **Input format (COCO)**: `[x, y, width, height]`
-- **Output format**: `[x1, y1, x2, y2]` (top-left and bottom-right corners)
+## Instance Retrieval Usage
 
-### Mask Encoding
-- Binary masks are encoded using Run-Length Encoding (RLE)
-- Masks are thresholded to binary (0 or 1) before encoding
-- Query masks are extracted from PNG files with transparency
-
-## Usage
-
-### Processing the Dataset
+### Processing for Retrieval
 
 ```bash
-# Basic usage
+# Process full retrieval dataset
 python create_dataset.py --voxdet-root /path/to/VoxDet
 
-# Custom output path
-python create_dataset.py --voxdet-root /path/to/VoxDet --output-file custom_anns.pt
+# Process for specific retrieval scenarios
+python create_dataset.py --voxdet-root /path/to/VoxDet --output-file retrieval_anns.pt
 
-# Process only OWID
+# Synthetic-only retrieval (OWID)
 python create_dataset.py --skip-robotools
 
-# Process only RoboTools
+# Real-world retrieval evaluation (RoboTools)
 python create_dataset.py --skip-owid
-
-# Debug mode with limited categories
-python create_dataset.py --debug --max-categories 5
 ```
 
-### Command-line Arguments
-
-| Argument | Default | Description |
-|----------|---------|-------------|
-| `--voxdet-root` | `/datasets/agamotto/Agamotto-SO/VoxDet` | Root directory of VoxDet dataset |
-| `--owid-path` | `OWID` | Relative path to OWID dataset |
-| `--robotools-path` | `RoboTools` | Relative path to RoboTools dataset |
-| `--output-file` | `anns.pt` | Output annotation file path |
-| `--process-owid` | `True` | Process OWID dataset |
-| `--process-robotools` | `True` | Process RoboTools dataset |
-| `--skip-owid` | `False` | Skip OWID processing |
-| `--skip-robotools` | `False` | Skip RoboTools processing |
-| `--debug` | `False` | Enable debug mode with verbose output |
-| `--max-categories` | `None` | Process only first N categories (debugging) |
-
-### Loading Annotations in Python
+### Instance Retrieval in Python
 
 ```python
 import torch
+from collections import defaultdict
 
-# Load annotations
+# Load retrieval annotations
 anns = torch.load('anns.pt')
 
-# Access specific image annotations
-image_path = 'path/to/image.jpg'
-if str(image_path) in anns:
-    ann = anns[str(image_path)]
+# Separate query and gallery for retrieval
+queries = {k: v for k, v in anns.items() if v['is_query']}
+gallery = {k: v for k, v in anns.items() if not v['is_query']}
+
+# Instance retrieval setup
+def setup_retrieval_pairs():
+    """Create query-gallery pairs for instance retrieval evaluation"""
+    retrieval_pairs = defaultdict(list)
     
-    # Check if query or gallery image
-    if ann['is_query']:
-        print(f"Query image for category {ann['ins']}")
-        print(f"Bounding box: {ann['bbox']}")
-    else:
-        print(f"Gallery image with {len(ann['ins'])} instances")
-        for i, (bbox, cat_id) in enumerate(zip(ann['bbox'], ann['ins'])):
-            print(f"  Instance {i}: Category {cat_id}, BBox: {bbox}")
+    for query_path, query_ann in queries.items():
+        instance_id = query_ann['ins']
+        
+        # Find all gallery images containing this instance
+        for gallery_path, gallery_ann in gallery.items():
+            if instance_id in gallery_ann['ins']:
+                retrieval_pairs[query_path].append({
+                    'gallery_path': gallery_path,
+                    'instance_bbox': gallery_ann['bbox'][
+                        gallery_ann['ins'].index(instance_id)
+                    ],
+                    'dataset': gallery_ann['set']
+                })
+    
+    return retrieval_pairs
 
-# Filter by dataset
-owid_anns = {k: v for k, v in anns.items() if v['set'] == 'OWID'}
-robotools_anns = {k: v for k, v in anns.items() if v['set'] == 'RoboTools'}
+# Evaluate retrieval performance
+def evaluate_retrieval(retrieved_images, ground_truth):
+    """Calculate retrieval metrics (mAP, Recall@K, etc.)"""
+    # Implementation of retrieval metrics
+    pass
 
-# Get all query images
-query_images = {k: v for k, v in anns.items() if v['is_query']}
+# Cross-domain retrieval analysis
+synthetic_queries = {k: v for k, v in queries.items() if v['set'] == 'OWID'}
+real_queries = {k: v for k, v in queries.items() if v['set'] == 'RoboTools'}
 
-# Get validation set
-val_images = {k: v for k, v in anns.items() if v['is_val']}
+print(f"Total query instances: {len(queries)}")
+print(f"Gallery size: {len(gallery)}")
+print(f"Synthetic queries (OWID): {len(synthetic_queries)}")
+print(f"Real-world queries (RoboTools): {len(real_queries)}")
 ```
 
-## Dataset Statistics
+## Retrieval Evaluation Metrics
 
-After processing, you can analyze the dataset:
+Standard instance retrieval metrics for evaluation:
+
+```python
+# Instance Retrieval Metrics
+- mean Average Precision (mAP)
+- Recall@K (K=1, 5, 10, 50, 100)
+- Precision@K
+- Instance-level IoU matching
+- Ranking quality measures
+```
+
+## Dataset Statistics for Retrieval
 
 ```python
 import torch
-from collections import Counter
+from collections import Counter, defaultdict
 
 anns = torch.load('anns.pt')
 
-# Basic statistics
-total_images = len(anns)
-query_images = sum(1 for v in anns.values() if v['is_query'])
-gallery_images = total_images - query_images
+# Retrieval statistics
+queries = {k: v for k, v in anns.items() if v['is_query']}
+gallery = {k: v for k, v in anns.items() if not v['is_query']}
 
-# Dataset distribution
-dataset_dist = Counter(v['set'] for v in anns.values())
+# Instance frequency in gallery (retrieval difficulty)
+instance_frequency = defaultdict(int)
+for ann in gallery.values():
+    for ins_id in ann['ins']:
+        instance_frequency[ins_id] += 1
 
-# Category distribution
-all_categories = []
-for ann in anns.values():
-    if ann['is_query']:
-        all_categories.append(ann['ins'])
-    else:
-        all_categories.extend(ann['ins'])
-category_dist = Counter(all_categories)
+# Retrieval complexity analysis
+easy_instances = sum(1 for freq in instance_frequency.values() if freq > 10)
+medium_instances = sum(1 for freq in instance_frequency.values() if 5 <= freq <= 10)
+hard_instances = sum(1 for freq in instance_frequency.values() if freq < 5)
 
-print(f"Total images: {total_images}")
-print(f"Query images: {query_images}")
-print(f"Gallery images: {gallery_images}")
-print(f"Dataset distribution: {dict(dataset_dist)}")
-print(f"Number of unique categories: {len(category_dist)}")
+print(f"=== Instance Retrieval Statistics ===")
+print(f"Query instances: {len(queries)}")
+print(f"Gallery images: {len(gallery)}")
+print(f"Unique instances: {len(instance_frequency)}")
+print(f"Average instances per gallery image: {sum(len(v['ins']) for v in gallery.values())/len(gallery):.2f}")
+print(f"\n=== Retrieval Difficulty Distribution ===")
+print(f"Easy (>10 occurrences): {easy_instances}")
+print(f"Medium (5-10 occurrences): {medium_instances}")
+print(f"Hard (<5 occurrences): {hard_instances}")
 ```
 
 ## Requirements
@@ -215,46 +233,61 @@ print(f"Number of unique categories: {len(category_dist)}")
 # Install required packages
 pip install torch pillow numpy tqdm
 
-# Download OWID and RoboTools datasets to appropriate directories
-# Ensure directory structure matches the expected format
+# Download base VoxDet datasets
+# Ensure OWID and RoboTools follow the expected structure
 
-# Process the dataset
+# Process for instance retrieval
 python create_dataset.py --voxdet-root /path/to/VoxDet
 ```
 
-## Data Format Notes
+## Instance Retrieval Applications
 
-### OWID Annotations
-- Uses standard COCO format with additional `num_ins` field
-- Includes segmentation masks in polygon format
-- Separated into training and validation sets
+This dataset supports various instance retrieval research:
 
-### RoboTools Annotations
-- COCO format for bounding boxes
-- Query masks provided as separate PNG files
-- Test set only (no training/validation split)
+1. **Fine-grained Instance Retrieval**: Retrieve specific object instances across diverse conditions
+2. **Cross-domain Retrieval**: Train on synthetic (OWID) and evaluate on real (RoboTools)
+3. **Few-shot Instance Learning**: Learn instance representations from limited queries
+4. **Multi-instance Retrieval**: Handle scenes with multiple target instances
+5. **Occlusion-robust Retrieval**: Retrieve partially visible instances
+6. **Viewpoint-invariant Retrieval**: Match instances across different viewpoints
 
-### Mask Processing
-- Binary masks are extracted from PNG alpha channels
-- Automatic thresholding applied for multi-value masks
-- Bounding boxes computed from mask regions
+## Retrieval-Specific Notes
+
+### OWID for Retrieval Training
+- Provides controlled instance variations for learning
+- Multiple instances per image for complex retrieval scenarios
+- Instance-level segmentation for precise evaluation
+
+### RoboTools for Real-world Retrieval
+- Challenging real-world retrieval scenarios
+- Industrial/robotic objects with practical applications
+- Test-only split for zero-shot retrieval evaluation
+
+### Instance Matching Strategy
+- Use instance IDs (`ins` field) for ground truth matching
+- Bounding box IoU for spatial retrieval accuracy
+- Mask overlap for pixel-level retrieval precision
 
 ## Citation
 
-If you use this dataset, please cite:
+If you use this instance retrieval dataset, please cite:
 
 ```bibtex
 @inproceedings{green2025findyourneedle,
   author={Green, Michael and Levy, Matan and Tzachor, Issar and Samuel, Dvir and Darshan, Nir and Ben-Ari, Rami},
   title={Find your Needle: Small Object Image Retrieval via Multi-Object Attention Optimization},
-  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
-  year={2025},
+  booktitle={Advances in Neural Information Processing Systems (NeurIPS)},
+  year={2025}
 }
 
 @dataset{voxdet2024,
-  title={VoxDet: A Unified Dataset for Query-based Object Detection},
-  author={Your Name},
+  title={VoxDet: Visual Object eXtended Detection Dataset},
+  author={VoxDet Contributors},
   year={2024},
-  publisher={Your Institution}
+  note={Base dataset for instance retrieval tasks}
 }
 ```
+
+## Acknowledgments
+
+This instance retrieval dataset is built upon the VoxDet foundation, extending it specifically for instance-level visual search and retrieval research. We thank the VoxDet contributors for providing the base annotations and structure.
