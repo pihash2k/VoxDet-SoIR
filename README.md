@@ -308,12 +308,6 @@ If you use this instance retrieval dataset, please cite:
   year={2025}
 }
 
-@dataset{voxdet2024,
-  title={VoxDet: Visual Object eXtended Detection Dataset},
-  author={VoxDet Contributors},
-  year={2024},
-  note={Base dataset for instance retrieval tasks}
-}
 ```
 
 ## Acknowledgments
