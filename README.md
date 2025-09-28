@@ -209,19 +209,6 @@ print(f"Synthetic queries (OWID): {len(synthetic_queries)}")
 print(f"Real-world queries (RoboTools): {len(real_queries)}")
 ```
 
-## Retrieval Evaluation Metrics
-
-Standard instance retrieval metrics for evaluation:
-
-```python
-# Instance Retrieval Metrics
-- mean Average Precision (mAP)
-- Recall@K (K=1, 5, 10, 50, 100)
-- Precision@K
-- Instance-level IoU matching
-- Ranking quality measures
-```
-
 ## Dataset Statistics for Retrieval
 
 ```python
