@@ -10,7 +10,7 @@ Download the base VoxDet dataset from the official repository:
 
 ## Overview
 
-This dataset extends VoxDet for **instance retrieval** applications, where the primary task is to retrieve all occurrences of a query object instance from a large gallery of images. Unlike traditional object detection that focuses on category-level detection, this dataset emphasizes **instance-level retrieval** - finding the exact same object or highly similar instances across different viewpoints, lighting conditions, and contexts.
+This dataset extends VoxDet for **instance retrieval** applications, where the primary task is to retrieve all occurrences of a query object instance from a large gallery of images. Unlike traditional object detection that focuses on category-level detection, this dataset emphasizes instance-level retrieval - finding the exact same object or highly similar instances across different viewpoints, lighting conditions, and contexts.
 
 ### Key Features
 - **Instance-level annotations** for precise object retrieval
@@ -116,7 +116,7 @@ The annotations are optimized for instance retrieval tasks:
 python create_dataset.py --voxdet-root /path/to/VoxDet
 
 # Process for specific retrieval scenarios
-python create_dataset.py --voxdet-root /path/to/VoxDet --output-file retrieval_anns.pt
+python create_dataset.py --voxdet-root /path/to/VoxDet --output-file anns.pt
 
 # Synthetic-only retrieval (OWID)
 python create_dataset.py --skip-robotools
