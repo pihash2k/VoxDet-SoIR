@@ -9,7 +9,6 @@ VoxDet is designed for few-shot and query-based object detection tasks where the
 ## Dataset Components
 
 ### 1. OWID (Open World Instance Detection)
-- **Type**: Synthetic dataset
 - **Content**: Computer-generated images with precise annotations
 - **Structure**: Query-gallery pairs with segmentation masks
 - **Split**: Training and validation sets
@@ -103,19 +102,19 @@ The processed annotations are saved as a PyTorch dictionary with the following s
 
 ```bash
 # Basic usage
-python process_voxdet.py --voxdet-root /path/to/VoxDet
+python create_dataset.py --voxdet-root /path/to/VoxDet
 
 # Custom output path
-python process_voxdet.py --voxdet-root /path/to/VoxDet --output-file custom_anns.pt
+python create_dataset.py --voxdet-root /path/to/VoxDet --output-file custom_anns.pt
 
 # Process only OWID
-python process_voxdet.py --skip-robotools
+python create_dataset.py --skip-robotools
 
 # Process only RoboTools
-python process_voxdet.py --skip-owid
+python create_dataset.py --skip-owid
 
 # Debug mode with limited categories
-python process_voxdet.py --debug --max-categories 5
+python create_dataset.py --debug --max-categories 5
 ```
 
 ### Command-line Arguments
@@ -219,7 +218,7 @@ pip install torch pillow numpy tqdm
 # Ensure directory structure matches the expected format
 
 # Process the dataset
-python process_voxdet.py --voxdet-root /path/to/VoxDet
+python create_dataset.py --voxdet-root /path/to/VoxDet
 ```
 
 ## Data Format Notes
