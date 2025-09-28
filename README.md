@@ -9,6 +9,7 @@ VoxDet is designed for few-shot and query-based object detection tasks where the
 ## Dataset Components
 
 ### 1. OWID (Open World Instance Detection)
+- **Type**: Synthetic dataset
 - **Content**: Computer-generated images with precise annotations
 - **Structure**: Query-gallery pairs with segmentation masks
 - **Split**: Training and validation sets
