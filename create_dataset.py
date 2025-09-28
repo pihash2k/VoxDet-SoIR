@@ -39,7 +39,7 @@ def get_bbox_from_mask(mask):
 
 
 def add_gall_anns_real(
-    anns, im_path, imgs_bboxes, is_query, is_val, ind, set, cat_id
+    anns, im_path, imgs_bboxes, is_query, ind, set, cat_id
 ):
     """Add gallery annotations for RoboTools dataset."""
     if str(im_path) not in anns:
@@ -48,7 +48,6 @@ def add_gall_anns_real(
         anns[str(im_path)]["num_ins"] = []
         anns[str(im_path)]["mask"] = []
         anns[str(im_path)]["is_query"] = is_query
-        anns[str(im_path)]["is_val"] = is_val
         anns[str(im_path)]["ins"] = []
         anns[str(im_path)]["set"] = set
     anns[str(im_path)]["bbox"].append(imgs_bboxes[ind])
@@ -78,7 +77,6 @@ def add_query_anns(anns, im_path, cat_id, set, masks_path):
         anns[str(im_path)]["bbox"] = bbox
         anns[str(im_path)]["mask"] = encoded
         anns[str(im_path)]["is_query"] = True
-        anns[str(im_path)]["is_val"] = False
         anns[str(im_path)]["ins"] = cat_id
         anns[str(im_path)]["set"] = set
     except Exception as e:
@@ -92,7 +90,6 @@ def add_gall_anns(
     imgs_segs,
     imgs_num_ins,
     is_query,
-    is_val,
     ind,
     set,
     cat_id,
@@ -104,7 +101,6 @@ def add_gall_anns(
         anns[str(im_path)]["num_ins"] = []
         anns[str(im_path)]["mask"] = []
         anns[str(im_path)]["is_query"] = is_query
-        anns[str(im_path)]["is_val"] = is_val
         anns[str(im_path)]["ins"] = []
         anns[str(im_path)]["set"] = set
     anns[str(im_path)]["bbox"].append(imgs_bboxes[ind])

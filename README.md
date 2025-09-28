@@ -78,10 +78,8 @@ The annotations are optimized for instance retrieval tasks:
         "bbox": [...],        # Instance bounding boxes
         "mask": [...],        # Instance segmentation masks (RLE)
         "is_query": bool,     # Query instance flag
-        "is_val": bool,       # Validation set flag
         "ins": [...],         # Instance IDs for retrieval matching
         "set": str,           # Dataset source ("OWID" or "RoboTools")
-        "num_ins": [...]      # Instance count (OWID only)
     },
     ...
 }
