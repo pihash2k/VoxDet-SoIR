@@ -2,6 +2,12 @@
 
 A comprehensive instance retrieval dataset built upon the VoxDet foundation, combining synthetic (OWID) and real-world (RoboTools) data for visual instance search and retrieval tasks.
 
+## Download
+
+Download the base VoxDet dataset from the official repository:
+- **GitHub Repository**: [https://github.com/Jaraxxus-Me/VoxDet](https://github.com/Jaraxxus-Me/VoxDet)
+- Follow the download instructions in the repository to obtain both OWID and RoboTools datasets
+
 ## Overview
 
 This dataset extends VoxDet for **instance retrieval** applications, where the primary task is to retrieve all occurrences of a query object instance from a large gallery of images. Unlike traditional object detection that focuses on category-level detection, this dataset emphasizes **instance-level retrieval** - finding the exact same object or highly similar instances across different viewpoints, lighting conditions, and contexts.
@@ -119,7 +125,68 @@ python create_dataset.py --skip-robotools
 python create_dataset.py --skip-owid
 ```
 
-### Instance Retrieval in Python
+### Dataset Verification
+
+After creating the dataset, verify its integrity using the included verification script:
+
+```bash
+# Basic verification
+python verify_dataset.py --ann-file anns.pt
+
+# With custom base path
+python verify_dataset.py --ann-file anns.pt --base-path /path/to/VoxDet
+
+# Skip path checking (faster)
+python verify_dataset.py --ann-file anns.pt --skip-paths
+
+# Verbose mode with detailed output
+python verify_dataset.py --ann-file anns.pt --verbose
+```
+
+#### Verification Features
+
+The `verify_dataset.py` script performs comprehensive validation of your processed dataset:
+
+**1. Path Verification**
+- Checks that all annotated image paths exist on disk
+- Reports missing files and their locations
+- Can be skipped with `--skip-paths` for faster verification
+
+**2. Annotation Structure Validation**
+- Verifies all required fields are present (`bbox`, `is_query`, `ins`, `set`)
+- Checks data types and value ranges
+- Validates bbox format (single for queries, list for gallery)
+- Ensures dataset identifiers are valid ('OWID' or 'RoboTools')
+
+**3. Retrieval Statistics Analysis**
+- Separates and counts query vs gallery images
+- Calculates instance frequency distribution
+- Analyzes retrieval difficulty (easy/medium/hard based on occurrence)
+- Provides dataset split statistics (train/val/test)
+- Reports query-gallery matching coverage
+
+**4. Mask Verification**
+- Validates RLE-encoded mask format
+- Checks mask presence and structure
+- Samples masks for detailed verification
+
+**5. Data Consistency Checks**
+- Ensures bbox count matches instance ID count
+- Verifies mask-bbox alignment
+- Checks query vs gallery annotation consistency
+
+**6. Detailed Report Generation**
+
+The script generates a comprehensive report including:
+- Total images, queries, and gallery size
+- Instance distribution and retrieval difficulty
+- Dataset split breakdown
+- Issues found with specific examples
+- Overall verification status (PASSED/ISSUES FOUND)
+
+With `--verbose` flag, saves detailed JSON report for further analysis.
+
+### Gallery and Query images (Synthetic/Real)
 
 ```python
 import torch
@@ -131,33 +198,6 @@ anns = torch.load('anns.pt')
 # Separate query and gallery for retrieval
 queries = {k: v for k, v in anns.items() if v['is_query']}
 gallery = {k: v for k, v in anns.items() if not v['is_query']}
-
-# Instance retrieval setup
-def setup_retrieval_pairs():
-    """Create query-gallery pairs for instance retrieval evaluation"""
-    retrieval_pairs = defaultdict(list)
-    
-    for query_path, query_ann in queries.items():
-        instance_id = query_ann['ins']
-        
-        # Find all gallery images containing this instance
-        for gallery_path, gallery_ann in gallery.items():
-            if instance_id in gallery_ann['ins']:
-                retrieval_pairs[query_path].append({
-                    'gallery_path': gallery_path,
-                    'instance_bbox': gallery_ann['bbox'][
-                        gallery_ann['ins'].index(instance_id)
-                    ],
-                    'dataset': gallery_ann['set']
-                })
-    
-    return retrieval_pairs
-
-# Evaluate retrieval performance
-def evaluate_retrieval(retrieved_images, ground_truth):
-    """Calculate retrieval metrics (mAP, Recall@K, etc.)"""
-    # Implementation of retrieval metrics
-    pass
 
 # Cross-domain retrieval analysis
 synthetic_queries = {k: v for k, v in queries.items() if v['set'] == 'OWID'}
@@ -231,11 +271,14 @@ print(f"Hard (<5 occurrences): {hard_instances}")
 # Install required packages
 pip install torch pillow numpy tqdm
 
-# Download base VoxDet datasets
+# Download base VoxDet datasets from https://github.com/Jaraxxus-Me/VoxDet
 # Ensure OWID and RoboTools follow the expected structure
 
 # Process for instance retrieval
 python create_dataset.py --voxdet-root /path/to/VoxDet
+
+# Verify dataset integrity
+python verify_dataset.py --ann-file anns.pt
 ```
 
 ## Instance Retrieval Applications
