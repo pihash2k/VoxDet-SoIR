@@ -292,7 +292,6 @@ def main():
                             [seg],
                             [num_ins],
                             False,
-                            False,
                             0,
                             "OWID",
                             cat_id,
