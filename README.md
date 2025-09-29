@@ -20,7 +20,7 @@ This dataset extends VoxDet for **instance retrieval** applications, where the p
 
 ## Dataset Comparison
 
-VoxDet-SoIR stands out among instance retrieval datasets with its focus on small objects and dense annotations. With an average object size of just 1.1% of the image area, significantly smaller than existing benchmarks and multiple annotated objects per image. VoxDet-SoIR addresses the challenging yet practical scenario of retrieving small instances from cluttered scenes.
+VoxDet-SoIR stands out among instance retrieval datasets with its focus on small objects and multiple annotations. With an average object size of just 1.1% of the image area, significantly smaller than existing benchmarks and multiple annotated objects per image. VoxDet-SoIR addresses the challenging yet practical scenario of retrieving small instances from cluttered scenes.
 
 | Dataset | #Obj Annot. | #Obj OVD | Obj. Size (in %) |
 |---------|-------------|----------|------------------|
