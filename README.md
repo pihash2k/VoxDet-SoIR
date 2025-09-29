@@ -20,20 +20,18 @@ This dataset extends VoxDet for **instance retrieval** applications, where the p
 
 ## Dataset Comparison
 
-Comparison of VoxDet with other instance retrieval datasets:
+VoxDet stands out among instance retrieval datasets with its focus on small objects and dense annotations. With an average object size of just 1.1% of the image area—significantly smaller than existing benchmarks—and multiple annotated objects per image, VoxDet addresses the challenging yet practical scenario of retrieving small instances from cluttered, real-world scenes.
 
 | Dataset | #Obj Annot. | #Obj OVD | Obj. Size (in %) |
 |---------|-------------|----------|------------------|
 | VoxDet | 5.8 | 14.7 | 1.1 |
 | PerMiR | 4.7 | 10.4 | 13.3 |
-| INSTRE-XS | 1 | 1.8 | 6.6 |
-| INSTRE-XXS | 1 | 1.9 | 2.2 |
 | INSTRE (S1) | 1 | 1.8 | 21.0 |
 | Products-10K | 1 | 2.1 | 27.1 |
 | ℛOxford | 1 | 5.9 | 37.6 |
 | ℛParis6K | 1 | 4.9 | 41.4 |
 
-*Note: #Obj Annot. refers to the average number of annotated objects, #Obj OVD represents objects with occlusion/viewpoint/deformation variations, and Obj. Size indicates the average object size as a percentage of the image.*
+*Note: #Obj Annot. denotes the average number of manually annotated objects per image, #Obj OVD indicates the average number of objects detected using an open vocabulary detector, and Obj. Size represents the mean object size as a percentage of the total image area.*
 
 
 ## Instance Retrieval Task
