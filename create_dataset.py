@@ -384,7 +384,6 @@ def main():
                             img_path,
                             [bbox],
                             False,
-                            False,
                             0,
                             "RoboTools",
                             cat_id,
